@@ -1,44 +1,16 @@
-#ifndef _LIFO_FIFO_H_
-#define _LIFO_FIFO_H_
-
-#define _GNU_SOURCE
-/* <-------|STANDARD LIBRARIES|-------> */
+#ifndef __MONTY_H__
+#define __MONTY_H__
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include <fcntl.h>
-#include <string.h>
-#include <sys/stat.h>
-#include <sys/types.h>
-#include <limits.h>
-#include <ctype.h>
 
-/* <-------|MACROS PREDEFINED|-------> */
+#define STACK 0
+#define QUEUE 1
+#define DELIMS " \n\t\a\b"
 
-#define BUFSIZE 1024
-#define LIFO 1
-#define FIFO 0
-#define TRUE (1 == 1)
-#define FALSE (!TRUE)
-#define ERROR_MALLOC 0
-#define ERROR_USAGE_FILE 1
-#define ERROR_OPEN_FILE 2
-#define ERROR_UNKNOWN 3
-#define ERROR_PUSH 4
-#define ERROR_PINT 5
-#define ERROR_POP 6
-#define ERROR_SWAP 7
-#define ERROR_ADD 8
-#define ERROR_SUB 9
-#define ERROR_DIV 10
-#define ERROR_DIV_ZERO 11
-#define ERROR_MUL 12
-#define ERROR_MOD 13
-#define ERROR_STACK_EMPTY 14
-#define ERROR_PCHAR_RANGE 15
-
-/* <-------|DATA STRUCTURES|-------> */
+/* GLOBAL OPCODE TOKENS */
+extern char **op_toks;
 
 /**
  * struct stack_s - doubly linked list representation of a stack (or queue)
@@ -47,7 +19,7 @@
  * @next: points to the next element of the stack (or queue)
  *
  * Description: doubly linked list node structure
- * for stack, queues, LIFO, FIFO
+ * for stack, queues, LIFO, FIFO Holberton project
  */
 typedef struct stack_s
 {
@@ -62,7 +34,7 @@ typedef struct stack_s
  * @f: function to handle the opcode
  *
  * Description: opcode and its function
- * for stack, queues, LIFO, FIFO
+ * for stack, queues, LIFO, FIFO Holberton project
  */
 typedef struct instruction_s
 {
@@ -70,76 +42,48 @@ typedef struct instruction_s
 	void (*f)(stack_t **stack, unsigned int line_number);
 } instruction_t;
 
-/**
- * struct traverser_s - points to all other structs
- * @filename: the filename from argv[1]
- * @stack: pointer to stack
- * @line: input line received from getline
- * @input: lines of the files parsed into separate elements
- * @line_num: the linenumber
- * @file: the input file
- * @order: LIFO or FIFO
- */
-typedef struct traverser_s
-{
-	char *filename;
-	stack_t *stack;
-	char *line;
-	char **input;
-	unsigned int line_num;
-	FILE *file;
-	int order;
-} trave_t;
+/* PRIMARY INTERPRETER FUNCTIONS */
+void free_stack(stack_t **stack);
+int init_stack(stack_t **stack);
+int check_mode(stack_t *stack);
+void free_tokens(void);
+unsigned int token_arr_len(void);
+int run_monty(FILE *script_fd);
+void set_op_tok_error(int error_code);
 
-/* <-----| GLOBAL VARIABLES |-----> */
+/* OPCODE FUNCTIONS */
+void monty_push(stack_t **stack, unsigned int line_number);
+void monty_pall(stack_t **stack, unsigned int line_number);
+void monty_pint(stack_t **stack, unsigned int line_number);
+void monty_pop(stack_t **stack, unsigned int line_number);
+void monty_swap(stack_t **stack, unsigned int line_number);
+void monty_add(stack_t **stack, unsigned int line_number);
+void monty_nop(stack_t **stack, unsigned int line_number);
+void monty_sub(stack_t **stack, unsigned int line_number);
+void monty_div(stack_t **stack, unsigned int line_number);
+void monty_mul(stack_t **stack, unsigned int line_number);
+void monty_mod(stack_t **stack, unsigned int line_number);
+void monty_pchar(stack_t **stack, unsigned int line_number);
+void monty_pstr(stack_t **stack, unsigned int line_number);
+void monty_rotl(stack_t **stack, unsigned int line_number);
+void monty_rotr(stack_t **stack, unsigned int line_number);
+void monty_stack(stack_t **stack, unsigned int line_number);
+void monty_queue(stack_t **stack, unsigned int line_number);
 
-extern trave_t *traverse;
+/* CUSTOM STANDARD LIBRARY FUNCTIONS */
+char **strtow(char *str, char *delims);
+char *get_int(int n);
 
-/* <-------|ERRORS|-------> */
-int short_stack_error(unsigned int line_number, char *op);
-int div_error(unsigned int line_number);
-int pop_error(unsigned int line_number);
-int div_error(unsigned int line_number);
-int pchar_error(unsigned int line_number, char *message);
+/* ERROR MESSAGES & ERROR CODES */
 int usage_error(void);
 int malloc_error(void);
 int f_open_error(char *filename);
 int unknown_op_error(char *opcode, unsigned int line_number);
 int no_int_error(unsigned int line_number);
+int pop_error(unsigned int line_number);
+int pint_error(unsigned int line_number);
+int short_stack_error(unsigned int line_number, char *op);
+int div_error(unsigned int line_number);
+int pchar_error(unsigned int line_number, char *message);
 
-/* <-------| LISTS |-------> */
-
-void _lifo(stack_t **stack, stack_t *node);
-void _fifo(stack_t **queue, stack_t *node);
-
-/* <-------|HELPERS|-------> */
-
-int built_in(void);
-int _isDigit(char *c);
-void (*_opcode(void))(stack_t **stack, unsigned int x);
-int _parse(char *line);
-void _free(void);
-void s_free(void);
-void _error(int x);
-
-/* <-------|STACK FUNCTIONS|-------> */
-
-void _stack(stack_t **stack, unsigned int x);
-void _queue(stack_t **stack, unsigned int x);
-void _push(stack_t **stack, unsigned int x);
-void _pall(stack_t **stack, unsigned int x);
-void _pint(stack_t **stack, unsigned int x);
-void _pop(stack_t **stack, unsigned int x);
-void _swap(stack_t **stack, unsigned int x);
-void _add(stack_t **stack, unsigned int x);
-void _nop(stack_t **stack, unsigned int x);
-void _sub(stack_t **stack, unsigned int x);
-void _div(stack_t **stack, unsigned int x);
-void _mul(stack_t **stack, unsigned int x);
-void _mod(stack_t **stack, unsigned int x);
-void _pchar(stack_t **stack, unsigned int x);
-void _pstr(stack_t **stack, unsigned int x);
-void _rotl(stack_t **stack, unsigned int x);
-void _rotr(stack_t **stack, unsigned int x);
-
-#endif /* LIFO_FIFO_H */
+#endif /* __MONTY_H__ */
